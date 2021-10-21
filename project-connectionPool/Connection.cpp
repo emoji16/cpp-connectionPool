@@ -1,4 +1,5 @@
 #include "Connection.h"
+#include<ctime>
 #include<iostream>
 #include<string>
 #include "public.h"
@@ -7,6 +8,7 @@ using namespace std;
 
 Connection::Connection() {
 	_conn = mysql_init(nullptr);
+	_alivetime = clock();
 }
 
 Connection::~Connection() {
@@ -15,8 +17,8 @@ Connection::~Connection() {
 	}
 }
 
-bool Connection::connect(string ip, unsigned short port, string user, string password, string dbname) {
-	MYSQL* p = mysql_real_connect(_conn, ip.c_str(), user.c_str(), password.c_str(), dbname.c_str(), port, nullptr, 0);
+bool Connection::connect(string ip, unsigned short port, string username, string password, string dbname) {
+	MYSQL* p = mysql_real_connect(_conn, ip.c_str(), username.c_str(), password.c_str(), dbname.c_str(), port, nullptr, 0);
 	return p != nullptr;
 }
 
@@ -38,4 +40,13 @@ MYSQL_RES* Connection::query(string sql) {
 		return nullptr;
 	}
 	return mysql_use_result(_conn);
+}
+
+void Connection::refreshAliveTime()
+{
+	_alivetime = clock();
+}
+
+clock_t Connection::getAliveDuration() const {
+	return clock() - _alivetime;
 }
